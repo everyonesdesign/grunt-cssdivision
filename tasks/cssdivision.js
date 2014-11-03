@@ -6,51 +6,11 @@
  * Licensed under the MIT license.
  */
 
+//TODO: write docs
+//TODO: remove font-face, media etc from main file
+
 'use strict';
 
-function divideCSS(src, destDir, props) {
-
-    var fs = require('fs'),
-        css = require('css'),
-        stylesheetText,
-        filename = src.replace(/(.*\/?)(\w\d\._\-)$/, "$2"),
-        msg = "";
-
-    stylesheetText = fs.readFileSync(src, {
-        encoding: "UTF-8"
-    });
-
-    function divideStylesheet(stylesheet, baseStyles) {
-        var parsedStylesheet = css.parse(stylesheet);
-        for (var i = 0; i < parsedStylesheet.stylesheet.rules.length; i++) {
-            if (parsedStylesheet.stylesheet.rules[i].declarations) {
-                for (var j = 0; j < parsedStylesheet.stylesheet.rules[i].declarations.length; j++) {
-                    var declaration = parsedStylesheet.stylesheet.rules[i].declarations[j],
-                        property = declaration.property;
-                    if (baseStyles && declaration.type != "declaration") {continue;}
-                    if (
-                        ( baseStyles && !props.test(property) ) ||
-                            ( !baseStyles && props.test(property) )
-                        ) {
-                        parsedStylesheet.stylesheet.rules[i].declarations.splice(j, 1);
-                        j--;
-                    }
-                }
-            }
-        }
-        return css.stringify(parsedStylesheet);
-    }
-
-    try {
-        fs.writeFileSync(destDir.replace("\/?$", "/") + filename.replace(/\.\w+$/, ".main$0"), divideStylesheet(stylesheetText, true));
-        grunt.log.writeln('File "' + filename.replace(/\.\w+$/, ".main$0") + '" created.');
-        fs.writeFileSync(destDir.replace("\/?$", "/") + filename.replace(/\.\w+$/, ".decorative$0"), divideStylesheet(stylesheetText, false));
-        grunt.log.writeln('File "' + filename.replace(/\.\w+$/, ".decorative$0") + '" created.');
-    } catch(e) {
-        "Some error happened"
-    }
-
-}
 
 module.exports = function (grunt) {
 
@@ -77,10 +37,58 @@ module.exports = function (grunt) {
                 }
             }).map(function (filepath) {
                 // Read file source.
-                grunt.log.writeln('File "' + filepath + '" is being divided.');
+                grunt.log.writeln('File "' + filepath + '" is being divided...');
                 divideCSS(filepath, options.destDir, options.props);
             });
         });
     });
+
+    function divideCSS(src, destDir, props) {
+
+        var fs = require('fs'),
+            css = require('css'),
+            stylesheetText,
+            filename = src.replace(/(.*\/?)(\w\d\._\-)$/, "$2"),
+            msg = "";
+
+        stylesheetText = grunt.file.read(src, {
+            encoding: "UTF-8"
+        });
+
+        function divideStylesheet(stylesheet, baseStyles) {
+            var parsedStylesheet = css.parse(stylesheet);
+            for (var i = 0; i < parsedStylesheet.stylesheet.rules.length; i++) {
+                if (parsedStylesheet.stylesheet.rules[i].declarations) {
+                    for (var j = 0; j < parsedStylesheet.stylesheet.rules[i].declarations.length; j++) {
+                        var declaration = parsedStylesheet.stylesheet.rules[i].declarations[j],
+                            property = declaration.property;
+                        if (baseStyles && declaration.type != "declaration") {
+                            parsedStylesheet.stylesheet.rules.splice(i, 1);
+                            i--;
+                            continue;
+                        }
+                        if (
+                            ( baseStyles && !props.test(property) ) ||
+                                ( !baseStyles && props.test(property) )
+                            ) {
+                            parsedStylesheet.stylesheet.rules[i].declarations.splice(j, 1);
+                            j--;
+                        }
+                    }
+                }
+            }
+            return css.stringify(parsedStylesheet);
+        }
+
+        try {
+            grunt.file.write(destDir.replace("\/?$", "/") + filename.replace(/\.\w+$/, ".main$&"), divideStylesheet(stylesheetText, true));
+            grunt.log.writeln('File "' + filename.replace(/\.\w+$/, ".main$&") + '" created.');
+            grunt.file.write(destDir.replace("\/?$", "/") + filename.replace(/\.\w+$/, ".decorative$&"), divideStylesheet(stylesheetText, false));
+            grunt.log.writeln('File "' + filename.replace(/\.\w+$/, ".decorative$&") + '" created.');
+        } catch(e) {
+            grunt.log.error(e);
+        }
+
+    }
 
 };
