@@ -7,7 +7,6 @@
  */
 
 //TODO: write docs
-//TODO: remove font-face, media etc from main file
 
 'use strict';
 
@@ -58,15 +57,13 @@ module.exports = function (grunt) {
         function divideStylesheet(stylesheet, baseStyles) {
             var parsedStylesheet = css.parse(stylesheet);
             for (var i = 0; i < parsedStylesheet.stylesheet.rules.length; i++) {
-                if (parsedStylesheet.stylesheet.rules[i].declarations) {
+                if (baseStyles && !/rule/.test(parsedStylesheet.stylesheet.rules[i].type)) {
+                    parsedStylesheet.stylesheet.rules.splice(i, 1);
+                    i--;
+                } else if (parsedStylesheet.stylesheet.rules[i].declarations) {
                     for (var j = 0; j < parsedStylesheet.stylesheet.rules[i].declarations.length; j++) {
                         var declaration = parsedStylesheet.stylesheet.rules[i].declarations[j],
                             property = declaration.property;
-                        if (baseStyles && declaration.type != "declaration") {
-                            parsedStylesheet.stylesheet.rules.splice(i, 1);
-                            i--;
-                            continue;
-                        }
                         if (
                             ( baseStyles && !props.test(property) ) ||
                                 ( !baseStyles && props.test(property) )
@@ -77,7 +74,9 @@ module.exports = function (grunt) {
                     }
                 }
             }
-            return css.stringify(parsedStylesheet);
+            return css.stringify(parsedStylesheet, {
+                compress: true
+            });
         }
 
         try {
@@ -87,6 +86,7 @@ module.exports = function (grunt) {
             grunt.log.writeln('File "' + filename.replace(/\.\w+$/, ".decorative$&") + '" created.');
         } catch(e) {
             grunt.log.error(e);
+            throw new Error("Something went wrong with cssdivision grunt module");
         }
 
     }
