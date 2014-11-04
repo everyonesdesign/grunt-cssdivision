@@ -23,9 +23,11 @@ module.exports = function (grunt) {
             destDir: "dest/"
         });
 
+        //adding slash at the end if there's no
+        options.destDir = options.destDir.replace(/\/?$/, "/");
+
         // Iterate over all specified file groups.
         this.files.forEach(function (f) {
-            // Concat specified files.
             var src = f.src.filter(function (filepath) {
                 // Warn on and remove invalid source files (if nonull was set).
                 if (!grunt.file.exists(filepath)) {
@@ -47,8 +49,7 @@ module.exports = function (grunt) {
         var fs = require('fs'),
             css = require('css'),
             stylesheetText,
-            filename = src.replace(/(.*\/?)(\w\d\._\-)$/, "$2"),
-            msg = "";
+            filename = src.replace(/(.*\/?)(\w\d\._\-)$/, "$2");
 
         stylesheetText = grunt.file.read(src, {
             encoding: "UTF-8"
