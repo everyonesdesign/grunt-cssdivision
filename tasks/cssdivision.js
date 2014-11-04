@@ -6,8 +6,6 @@
  * Licensed under the MIT license.
  */
 
-//TODO: write docs
-
 'use strict';
 
 
