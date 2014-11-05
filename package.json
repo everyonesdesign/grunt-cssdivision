@@ -28,8 +28,7 @@
   },
   "peerDependencies": {
       "css": "^2.1.0",
-      "grunt": "~0.4.5",
-      "grunt-cssbeautifier": "^0.1.2"
+      "grunt": "~0.4.5"
   },
   "keywords": [
     "gruntplugin"
