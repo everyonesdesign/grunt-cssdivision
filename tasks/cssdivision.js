@@ -17,6 +17,7 @@ module.exports = function (grunt) {
     grunt.registerMultiTask('cssdivision', 'Grunt plugin to divide CSS file into basic and decorative styles', function () {
         // Merge task-specific and/or target-specific options with these defaults.
         var options = this.options({
+            minify: true,
             props: /padding|margin|height|width|display|float|font/,
             destDir: "dest/"
         });
@@ -74,7 +75,7 @@ module.exports = function (grunt) {
                 }
             }
             return css.stringify(parsedStylesheet, {
-                compress: true
+                compress: !!options.minify
             });
         }
 

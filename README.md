@@ -17,6 +17,7 @@ Usage example (Gruntfile.js):
             src: ['*.css'] //files to be divided
           },
           options: {
+            minify: false, //default: true
             destDir: 'destinationDirectory' //default: "dest/"
           }
         }
