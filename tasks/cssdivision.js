@@ -38,12 +38,12 @@ module.exports = function (grunt) {
             }).map(function (filepath) {
                 // Read file source.
                 grunt.log.writeln('File "' + filepath + '" is being divided...');
-                divideCSS(filepath, options.destDir, options.props);
+                divideCSS(filepath, options.destDir, options.props, options);
             });
         });
     });
 
-    function divideCSS(src, destDir, props) {
+    function divideCSS(src, destDir, props, options) {
 
         var fs = require('fs'),
             css = require('css'),
